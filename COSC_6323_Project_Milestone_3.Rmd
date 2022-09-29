@@ -1,0 +1,735 @@
+
+```{r,echo=FALSE}
+
+library('MASS')
+library(olsrr)
+library('lme4')
+library(dplyr)
+library(MuMIn)
+library(ggplot2)
+library(interactions)
+library(sjPlot)
+library(jtools)
+library(tab)
+library(rstatix)
+library(grid)
+library(gridExtra)
+library(cowplot)
+
+library(gridExtra)
+
+```
+---
+title: "COSC 6323 Project Milestone-3"
+author: "Dhivya Parasuraman and Mahathi Sharma"
+date: "5/9/2022"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+# Appendix
+
+# Deriving Logistic Regression Models from Full and Null models using Selection methods
+
+**(1) For Model 2**
+
+* After performing the backward selection methods on full model and forward selection method on null model with all the parameters of Scholarly Profile Variables, research tactics and Personality traits for SG30, we found that the Akaike information criterion (AIC) scores for forward selected methods were 448.09, and backward and step-wise with 424.93. Since, the AIC for backward methods is lower, with a total of 8 predictors, each having significant and non-significant effects on the response variable SG30. We then take the predictor variables selected via backward selection and carefully examine for non-significant predictors. We tried removing the non-significant variables with the combinations of predictor variables and checked for the resulting AIC values. In case of SG30, first DWH(non-significant) is removed and a new model has been generated with all the other variables and its AIC is checked. Since removing DWH didn't affect the AIC score heavily, therefore DWH was removed out of the model. We also found TS and DS to be non-significant. Therefore, those two variables are also removed after checking the changes in the model's AIC value. Finally we concluded the final model with 5 predictor variables which has significance on the response variable with an AIC of **426.38.**
+
+
+**(2) For Model 3**
+
+* After performing the backward and step_wise selection methods on null model and forward selection method on full model with all the parameters of Scholarly Profile Variables, research tactics and Personality traits for SG50, we found that the Akaike information criterion (AIC) scores for forward selected methods were 323.56, and backward and step-wise with 304.31. Since, the AIC for backward methods is lower, with a total of 9 predictors, each having significant and non-significant effects on the response variable SG50. We then take the predictor variables selected via backward selection and carefully examine for non-significant predictors. We tried removing the non-significant variables with the combinations of predictor variables and checked for the resulting AIC values.Since removing TC didn't affect the AIC score heavily,therefore TC was removed out of the model. We also found DS to be non-significant. Therefore, that variable is also removed after checking the changes in the model's AIC value. Finally we concluded the final model with 7 predictor variables which has significance on the response variable with an AIC of **305.07.**
+
+
+**(3) For Model 4**
+
+* After performing the backward and step_wise selection methods on null model and forward selection method on full model with all the parameters of Scholarly Profile Variables, research tactics and Personality traits for SD75, we found that the Akaike information criterion (AIC) scores for forward selected methods were 555, and backward and step-wise with 530. Since, the AIC for backward methods is lower, with a total of 8 predictors, each having significant and non-significant effects on the response variable SD75. We then take the predictor variables selected via backward selection and carefully examine for non-significant predictors. We tried removing the non-significant variables with the combinations of predictor variables and checked for the resulting AIC values. We found that TA, O and H to be non-significant. Therefore, those variables are removed after checking the changes in the model's AIC value. Finally we concluded the final model with 5 predictor variables which has significance on the response variable with an AIC of **531.61.**
+
+**(4) For Model 5**
+
+* After performing the backward and step_wise selection methods on null model and forward selection method on full model with all the parameters of Scholarly Profile Variables, research tactics and Personality traits for SDD, we found that the Akaike information criterion (AIC) scores for forward selected methods were 432, and backward and step-wise with 404.8. Since, the AIC for backward methods is lower, with a total of 6 predictors, each having significant and non-significant effects on the response variable SDD. We then take the predictor variables selected via backward selection and carefully examine for non-significant predictors. We tried removing the non-significant variables with the combinations of predictor variables and checked for the resulting AIC values. We found that T, RS and TC to be non-significant. Therefore, those variables are removed after checking the changes in the model's AIC value. Finally we concluded the final model with 3 predictor variables which has significance on the response variable with an AIC of **406.73.**
+
+
+**(5) For Model 6**
+
+* After performing the backward and step_wise selection methods on null model and forward selection method on full model with all the parameters of Scholarly Profile Variables, research tactics and Personality traits for S50DD, we found that the Akaike information criterion (AIC) scores for forward selected methods were 185, and backward and step-wise with 159.8. Since, the AIC for backward methods is lower, with a total of 6 predictors, each having significant and non-significant effects on the response variable S50DD. We then take the predictor variables selected via backward selection and carefully examine for non-significant predictors. We tried removing the non-significant variables with the combinations of predictor variables and checked for the resulting AIC values. We found that RS and O to be non-significant. Therefore, those variables are removed after checking the changes in the model's AIC value. Finally we concluded the final model with 4 predictor variables which has significance on the response variable with an AIC of **160.95.**
+
+
+
+
+```{r setup, include=FALSE}
+
+# Reading the dataset
+dataset <- read.csv('KeyData.csv')
+
+```
+
+
+
+#  Dataset Introduction
+
+
+The dataset taken for observation is the **Predictors of grantsmanship and funding success for U.S. researchers** dataset. The dataset is obtained as a result of a nationwide survey of U.S. academic professors, to investigate the behavioral and other characteristics of researchers who excel in obtaining funding and grantsmanship for their research. The dataset consists of **403 rows** participants, who are ranked as **Assistant Professor**, or **Associate Professor** or **Professor**. And the dataset has **131 columns** which has different features describing about each of the participants to name a few like their gender, department, state, and no.of hours they work, etc.
+
+
+# Data Transformations
+
+* Using the data collected via a survey of US-Professors, we arrive at insightful behavioral findings that underpin grantsmanship. 
+
+* Per the design of our survey, the said predictors were drawn from a broader set of variables that fall under three categories: Research Tactics, Scholar Profile, and Personality.
+
+* Please refer the appendix for detailed information regarding the data transformations.
+
+# Research Tactics Predictors
+
+* The research tactics include various methods employed in order to achieve successful funding for the research.
+
+
+**1. Number of Proposals(NP):** This describes how often researchers submit proposals per year and its consequential grantsmanship tactic. The NP variable is aggregated to the following three levels, NP1(1-2 proposals per year), NP2(3-4 proposals per year), and finally NP3(5 or more proposals per year).
+
+**2. Funding Agency(FA)**
+
+* The funding agency to which researchers send the majority of their proposals turned out to be a critical tactical predictor of grantsmanship and financing success. The different funding agencies given are:
+
+* National Science Foundation (NSF group)
+* National Institutes of Health (NIH group)
+* Department of Energy (DOE group)
+* Department of Defense (DOD group)
+* National Aeronautics and Space Administration (NASA group)
+* Others
+
+
+**3.Break Frequency(BR)**
+
+* The frequency of taking brakes is one of the important factors in predicting the grantsmanship. These frequent breaks during a research activity may be associated with distractions which makes  difficult to concentrate or poor engagement in the work. The BR is important because, undermines the worker's productivity. The BF variable was aggregated to two levels:
+
+1. BF1 (every 1-2 hours or less), and 
+2. BF2 (every 3-4 hours or longer)
+
+
+**4.Pilot Research(PR)**
+
+* To grant the funding, the research review panel will take into account the pilot research. Pilot research is nothing but a model of the actual research to be undertaken. Therefore, the duration devoted to pilot research in support of proposal activity is considered as an important predictor of grantsmanship. The PR variable has the following five different levels:
+
+1. PR1 (less than 1 month), 
+2. PR2 (1-3 months), 
+3. PR3 (3-6 months), 
+4. PR4 (6-12 months), and 
+5. PR5 (more than 12 months) 
+
+**5. Time of Submission(TS)**
+
+* Completing a work before the deadline accounts a bit more for a successful proposal, because procrastinating the work until the last minute of deadline and submitting at the deadline could account for possible errors in the work. Therefore, Time of submission is emerged as crucial predictor of funding record.
+
+**6. Working Hours(WH)**
+
+* This variable describes the number of work hours per week.
+
+**7. Workload a week before(DWH)**
+
+* This parameter describes the Workload a week before proposal deadline, It has two levels with 1 and 2 (1 - Significantly less, Less, About the same; 2 - More, Significantly more).
+
+
+**8. Advance proposal(AP)**
+
+* This parameter describes how far in advance do participants start composing a proposal. It is has two levels with 1 and 2 (1 - less than 1 week, 1-2 weeks, 2-4 weeks; 2 - 1-2 months, greater than 2 months).
+
+
+# Scholarly Profile Variables: 
+
+* It describes the set of the following scholarly profile factors
+
+**1. Rank(FR)**
+
+* This variable describes the rank of the participants, where 0  describes the Assistant Professor, 1 -> Associate Professor, and 2 -> Professor.
+
+
+**2. Research Style(RS)**
+
+* This describes the way of the research done. The RS variable from the response says two levels,
+
+1. RS1 (hands-off) (here, researchers restrict themselves to the management and document composition)
+2. RS2 (hands-on) (here, researchers are directly involved in experimentation and analysis part)
+
+
+# Personality Variables:
+
+* It refers to the set of personality factors, here the relative intensity of deadline stress (DS). It includes (TLX,TA,E,A,C,N,O,AC,EC,TC)
+
+**1. Openness(O)**
+
+* Openness is one of the Big-Five personality traits and it is one of the funding record predictors. It explains that people with high levels of openness are more likely to seek out a variety
+of experiences and be comfortable with the unfamiliar because they tried different things. For our survey respondents sample, the descriptive statistics for O are: 7.5 plus or minus 1.8, with minimum value of 3 and maximum value of 10.
+
+**2. Agreeableness**
+
+* Agreeableness is one of the Big-Five personality traits it is one of the important funding record predictors because people who are high in agreeableness tend to be more collaborative.
+
+
+**3. Avoidance Coping (AC)**
+
+* Avoidance coping individuals are those who try to avoid stressors rather than dealing with them and it is considered as generally a mal-adaptive response. It is one of the predictors of grantsmanship. For our survey respondents sample, the descriptive statistics for AC are: 18.8 plus or minus 5.2, with minimum value of 7 and maximum value of 33.
+
+**4. Extraversion (E)**
+
+* This is one of the Big-Five personality traits which is considered as one of the important predictor for grantsmanship. For our survey respondents sample, the descriptive statistics for E are: 6.0 plus or minus 2.2, with minimum value of 2 and maximum value of 10.
+
+**5. Emotion Oriented Coping(EC)**
+
+* This is one of the Big-Five personality traits which is considered as one of the important predictor for grantsmanship. It has a value of Emotion Oriented Coping in a range of (5 to 35)
+
+**6. Task Oriented Coping(TC)**
+
+* This is one of the Big-Five personality traits which is considered as one of the important predictor for grantsmanship. It has a value of Task Oriented Coping in a range of (5 to 35)
+
+
+**7. Neuroticism(N)**
+
+* The level of participant’s nervousness with score range (2-10)
+
+
+**8.Trait Anxiety(TA)**
+
+* Trait anxiety, as evaluated by the STAI, is a predictor of stress predisposition. This predisposition reduces the work performance, therefore undermining the effectiveness of a research. Therefore, it is also considered as a predictor of grantsmanship. The score range of STAI is (20,80). By taking the respondents from our dataset, the descriptive statistics for the TA are: 41.3 plus or minus 10.3, where the minimum value is 20 and the maximum value is 70.
+
+1. The sub-range (20,37) is considered low anxiety, 
+2. The sub-range (38,44) is considered moderate anxiety,
+3. The sub-range (45,80) is considered high anxiety.
+
+**9. Task Load Index (TLX)**
+
+* This describes the sum of all the six aspects NASA Task Load Index (TLX)
+
+
+
+# Modelling (Part 1)
+
+# Grantsmanship performance
+
+* The data acquired via the survey initially had a seven-point success scale. But it has been binarized in two different ways, reflecting configurations characterized by differing definitions of grantsmanship success, to generate the response variables for the appropriate models. The main goal of doing a multi-configuration analysis is to find any predicting elements that distinguish extraordinary grantsmanship performance from average grantsmanship performance.
+
+1. **Successful Grantsmanship (SG30)** 
+
+2. **Highly Successful Grantsmanship (SG50)**
+
+**Successful Grantsmanship (SG30)** 
+
+* SG30 is the baseline arrangement, which explains a relatively more permissive definition of success in grantsmanship.
+
+**Highly Successful Grantsmanship (SG50)**
+
+* This is the ultimate arrangement, with a more stringent grantsmanship success criterion.
+
+# Grant Funding Record Analysis
+
+* In the United States academic system, faculty do not necessarily need to fund their entire research via external grants. There are some portions which receive external funding and some not. The six different responses(Fully funded, 100 to 75 percentage, 75 to 50 percentage, 50 to 25 percentage, 25 to 1 percentage, Not funded) from the faculties are binarized into two two different ways, as 
+
+**1. Fully Funded Research Operations (SDD)**
+**2. Well Funded Research Operations (SD75)**
+
+**Well Funded Research Operations (SD75)**
+
+* This category includes the respondents whose estimated grant funding level are equal to or greater than 75 percentage of their total needs. It is denoted as the most successful class(S1_75) and whose estimated funding is lower than 75 percentage is (S0_75). 
+
+
+**Fully Funded Research Operations(SDD)**
+
+* This category is the stricter category, and includes the respondents whose estimated grant funding level are fully funded of their total needs. It is denoted as the most successful class(S1_DD) and whose estimated funding is lower than 100 percentage is (S0_DD). 
+
+
+**SG50DD Combination of SG50 with SDD**
+
+* This is the combination of Highly Successful Grantsmanship record who are also Fully-Funded and is taken as a new model.
+
+
+**Final Models are as follows:**
+
+1. SG30 (Successful Grantsmanship)
+
+2. SG50 (Highly Successful Grantsmanship)
+
+3. SD75 (Well-Funded Research Operations) 
+
+4. SDD (Fully-Funded Research Operations)
+
+5. SG50DD (Combination of SG50 with SDD) 
+
+The model
+with the smallest AIC is the candidate best model. Next, we attempt micro-adjustments by
+examining whether any variables can be removed from this model, without losing statistically
+significant information and without any material changes to the minimal AIC. Through the
+said optimization process, we arrive at the following ultimate models for the configurations of
+interest:
+
+# Modelling (Part 2)
+
+* A Logistic regression framework is used to estimate the effect of research tactics, scholarly profile, and personality traits on the odds of success in grantsmanship. Initially we ran the model optimization for all each of the five configurations {G30,G50,SD75,SDD,S50DD}, staring from full model with all the predictor variables for backward elimination method and doing the forward elimination for a null model and also taking into account the significance of variables, and their AIC value, we construct an optimal model through step-wise selection by adding or removing explanatory variables included in the full model. The model with the smallest AIC score is regarded as the best model. We also made micro-adjustments without losing statistically significant information and without any material changes to the minimal AIC. 
+
+
+# Equation(2) and Equation(3) for Figure-2
+
+# Equation(2) 
+
+* Please refer Appendix(1) for the detailed information about the variables selected for SG30 or equation-2. 
+
+```{r,echo=FALSE}
+
+# Response Variable
+dataset$SR <- as.factor(dataset$SR)
+
+# 1. Research Tactics
+
+# Categorical Predictor Variables 
+dataset$WH <- as.factor(dataset$WH)
+
+dataset$BF <- as.factor(dataset$BF)
+
+dataset$NP <- as.factor(dataset$NP)
+
+dataset$FA <- as.factor(dataset$FA)
+
+dataset$AP <- as.factor(dataset$AP)
+
+dataset$AR <- as.factor(dataset$AR)
+
+dataset$DWH <- as.factor(dataset$DWH)
+
+dataset$T <- as.factor(dataset$T)
+
+
+# Quantitative Predictor Variables
+
+# TWR, DWR
+
+
+# 2. Scholarly Profile
+
+# Categorical Predictor Variables 
+
+dataset$Rank <- as.factor(dataset$Rank)
+
+dataset$RS <- as.factor(dataset$RS)
+
+# Quantitative Predictor Variables
+
+# H
+
+
+# 3. Personality Variables
+# Categorical Predictor Variables 
+
+dataset$DS <- as.factor(dataset$DS)
+
+# Quantitative Predictor Variables
+
+# NASA, TA, E, A, C, N, O, AC, EC, TC
+
+names(dataset)[24] <- 'T_t'
+
+
+# Full Model for SG30
+
+# Model-2  - SG30
+#     1         2       3         4       5       6         7
+# [0 = < 10%, 10-20%, 20-30%;     1 = 30-50%, 50-75%, 75-90%, > 90%].
+
+
+dataset$SG30 <- 2
+
+for(row in 1:nrow(dataset))
+{
+  if(dataset$SR[row]==1 | dataset$SR[row]==2 | dataset$SR[row]==3)
+  {
+    dataset$SG30[row]=0
+  }
+  if(dataset$SR[row]==4 | dataset$SR[row]==5 | dataset$SR[row]==6 | dataset$SR[row]==7)
+  {
+    dataset$SG30[row]=1
+  }
+  
+}
+
+
+```
+
+
+
+
+
+
+
+
+```{r, echo=FALSE}
+
+model2 <- glm(SG30~WH + BF + NP + FA + AP + AR + DWH + T_t + TWR + 
+                DWR  + RS + H + DS + TA + E + A + C + N + O + AC + EC + TC , data = dataset, family='binomial')
+
+
+
+forward_s30 <- stepAIC(model2, direction = "forward",trace=0)
+
+backward_s30 <- stepAIC(model2, direction = "backward",trace = 0)
+
+both_s30 <- stepAIC(model2, direction = "both" , trace = 0)
+
+
+#forward_s30$aic
+#backward_s30$aic
+#both_s30$aic
+
+#print("Summary of model obatined via backward selection")
+#summary(backward_s30)
+
+f_m_sg30 <- glm(SG30 ~ NP + FA + H + DS + TA , data = dataset, family='binomial')
+#summary(f_m_sg30)
+
+
+
+
+TS2 <- data.frame(coefficients(summary(f_m_sg30)), check.names = TRUE)
+TS2$Prob_wise <- exp(TS2$Estimate)/(1+exp(TS2$Estimate))
+
+names(TS2)[1] <- 'Odds-wise'
+names(TS2)[4] <- "Pr(>|z|)"
+
+TS2 <- TS2 %>% add_significance("Pr(>|z|)")
+
+#tab_df(TS2, digits = 3,show.rownames = TRUE)
+
+TS2  <- TS2 %>% relocate(Prob_wise, .before = `Odds-wise`)
+
+```
+
+**Table S2. Parameter estimates for the Successful Grantsmanship configuration SG30 (Logit Model (2), Methods).**The coefficients are given both probability-wise and odds-wise. The Akaike Information Criterion (AIC) for the model is 426.38. Significance levels have been set as follows: \*: p < 0.05, 
+\**: p < 0.01, 
+\***: p < 0.001.
+
+```{r,echo=FALSE}
+
+
+# Printing the table S2
+TS2  %>% kbl() %>% kable_classic(full_width = F, html_font = "Cambria")
+
+
+
+```
+
+
+# Equation(3) 
+
+* Please refer Appendix(2) for the detailed information about the variables selected for SG50 or equation-3. 
+```{r,echo=FALSE}
+
+# Model 3 - SG50
+
+#dataset$BF <- as.factor(dataset$BF)
+
+#     1         2       3         4         5       6         7
+# [0 = < 10%, 10-20%, 20-30%, 30-50%, ; 1 = 50-75%, 75-90%, > 90%].
+
+
+dataset$SG50 <- 1
+
+for(row in 1:nrow(dataset))
+{
+  if(dataset$SR[row]==1 | dataset$SR[row]==2 | dataset$SR[row]==3 | dataset$SR[row]==4)
+  {
+    dataset$SG50[row]=0
+  }
+  if(dataset$SR[row]==5 | dataset$SR[row]==6 | dataset$SR[row]==7)
+  {
+    dataset$SG50[row]=1
+  }
+  
+}
+
+#factor(dataset$SG50)
+
+
+
+model3 <- glm(dataset$SG50 ~ WH + BF + NP + FA + AP + AR + DWH + T_t + TWR + 
+                DWR  + RS + H + DS + TA + E + A + C 
+              + N + O + AC + EC + TC  , data = dataset, family='binomial')
+
+#summary(model3)
+
+
+forward_s50 <- stepAIC(model3, direction = "forward" , trace=0)
+
+backward_s50 <- stepAIC(model3, direction = "backward" , trace=0)
+
+both_s50 <- stepAIC(model3, direction = "both" , trace=0)
+
+#forward_s50$aic
+#backward_s50$aic
+#both_s50$aic
+
+
+f_m_sg50 <- glm(as.factor(dataset$SG50) ~ NP + FA + BF + AR + H  + E + AC , data=dataset,family='binomial')
+#summary(f_m_sg50)
+
+
+
+```
+
+
+
+**Table S3 Parameter estimates for the Highly Successful Grantsmanship Configuration SG50 (Logit Model (3),Methods).** The coefficients are given both probability-wise and odds-wise. The AIC for the model is 305.07.
+Significance levels have been set as follows: 
+\*: p < 0.05, \**: p < 0.01, \***: p < 0.001.
+
+```{r,echo=FALSE}
+
+# Table-S3
+
+
+TS3 <- data.frame(coefficients(summary(f_m_sg50)), check.names = TRUE)
+TS3$Prob_wise <- exp(TS3$Estimate)/(1+exp(TS3$Estimate))
+
+names(TS3)[1] <- 'Odds-wise'
+names(TS3)[4] <- "Pr(>|z|)"
+
+TS3 <- TS3 %>% add_significance("Pr(>|z|)")
+
+
+TS3  <- TS3 %>% relocate(Prob_wise, .before = `Odds-wise`)
+
+TS3  %>% kbl() %>% kable_classic(full_width = F, html_font = "Cambria")
+
+
+
+```
+
+
+
+# Figure-2
+
+
+# Equation-4 and Equation-5
+
+# Equation-4
+
+* Please refer Appendix(3) for the detailed information about the variables selected for SD75 or equation-4. 
+
+
+```{r,echo=FALSE}
+
+dataset$SG75 <- 1
+
+for(row in 1:nrow(dataset))
+{
+  if(dataset$FC[row]==1 | dataset$FC[row]==2 | dataset$FC[row]==3 | dataset$FC[row]==4)
+  {
+    dataset$SG75[row]=0
+  }
+  if(dataset$FC[row]==5 | dataset$FC[row]==6)
+  {
+    dataset$SG75[row]=1
+  }
+  
+}
+
+
+#factor(dataset$SG75)
+  
+model4 <- glm(as.factor(dataset$SG75) ~ WH + BF + NP + FA + AP + AR + DWH + T_t + TWR + 
+                DWR  + RS + H + DS + TA + E + A + C 
+              + N + O + AC + EC + TC  , data = dataset, family='binomial')
+
+#summary(model4)
+
+forward_s75 <- stepAIC(model4, direction = "forward" , trace=0)
+
+backward_s75 <- stepAIC(model4, direction = "backward" , trace = 0)
+
+both_s75 <- stepAIC(model4, direction = "both" , trace = 0)
+
+
+#forward_s75$aic
+#backward_s75$aic
+#both_s75$aic
+
+
+f_m_sg75 <- glm(as.factor(dataset$SG75) ~ FA + T_t + TWR + RS + H + O, data=dataset,family='binomial')
+#summary(f_m_sg75)
+
+
+
+```
+
+**Table S4. Parameter estimates for the Well-Funded Configuration S$75 (Logit Model (4), Methods).** The coefficients are given both probability-wise and odds-wise. The AIC for the model is 531.61. 
+Significance levels have been set as
+follows: \*: p < 0.05, \**: p < 0.01, \***: p < 0.001.
+
+```{r,echo=FALSE}
+
+# Table-S4
+
+
+TS4 <- data.frame(coefficients(summary(f_m_sg75)), check.names = TRUE)
+TS4$Prob_wise <- exp(TS4$Estimate)/(1+exp(TS4$Estimate))
+
+names(TS4)[1] <- 'Odds-wise'
+names(TS4)[4] <- "Pr(>|z|)"
+
+TS4 <- TS4 %>% add_significance("Pr(>|z|)")
+
+
+TS4  <- TS4 %>% relocate(Prob_wise, .before = `Odds-wise`)
+
+TS4  %>% kbl() %>% kable_classic(full_width = F, html_font = "Cambria")
+
+
+```
+
+
+# Equation-5
+
+* Please refer Appendix(4) for the detailed information about the variables selected for SD75 or equation-5. 
+
+
+```{r,echo=FALSE}
+
+
+dataset$SGDD <- 1
+
+for(row in 1:nrow(dataset))
+{
+  if(dataset$FC[row]==1 | dataset$FC[row]==2 | dataset$FC[row]==3 | dataset$FC[row]==4 | dataset$FC[row]==5)
+  {
+    dataset$SGDD[row]=0
+  }
+  if(dataset$FC[row]==6)
+  {
+    dataset$SGDD[row]=1
+  }
+  
+}
+
+model5 <- glm(as.factor(dataset$SGDD) ~ WH + BF + NP + FA + AP + AR + DWH + T_t + TWR + 
+                DWR  + RS + H + DS + TA + E + A + C 
+              + N + O + AC + EC + TC, data = dataset, family='binomial')
+
+#summary(model5)
+
+forward_sdd <- stepAIC(model5, direction = "forward" , trace=0)
+
+backward_sdd <- stepAIC(model5, direction = "backward" , trace = 0)
+
+both_sdd <- stepAIC(model5, direction = "both" , trace=0)
+
+
+#forward_sdd$aic
+#backward_sdd$aic
+#both_sdd$aic
+
+f_m_sgdd <- glm(as.factor(dataset$SGDD) ~ FA + TWR + O, data=dataset,family='binomial')
+#summary(f_m_sgdd)
+
+
+```
+
+
+**Table S5. Parameter estimates for the Fully-Funded Configuration SDD (Logit Model (5), Methods).** The coefficients are given both probability-wise and odds-wise. The AIC for the model is 406.73. Significance levels have been set as
+follows: \*: p < 0.05, \**: p < 0.01, \***: p < 0.001.
+
+```{r,echo=FALSE}
+
+# Table-S5
+
+TS5 <- data.frame(coefficients(summary(f_m_sgdd)), check.names = TRUE)
+TS5$Prob_wise <- exp(TS5$Estimate)/(1+exp(TS5$Estimate))
+
+names(TS5)[1] <- 'Odds-wise'
+names(TS5)[4] <- "Pr(>|z|)"
+
+TS5 <- TS5 %>% add_significance("Pr(>|z|)")
+
+TS5  <- TS5 %>% relocate(Prob_wise, .before = `Odds-wise`)
+
+TS5  %>% kbl() %>% kable_classic(full_width = F, html_font = "Cambria")
+
+
+
+```
+
+
+# Figure-3
+
+
+# Equation-6
+
+* Please refer Appendix(5) for the detailed information about the variables selected for SD75 or equation-6. 
+
+
+```{r,echo=FALSE}
+
+#Model - 6 - S50DD
+
+dataset$SG50DD <- 0
+
+for(row in 1:nrow(dataset))
+{
+  if(dataset$SR[row]==1 | dataset$SR[row]==2 | dataset$SR[row]==3 | dataset$SR[row]==4)
+  {
+    dataset$SG50DD[row]=0
+  }
+  if((dataset$SR[row]==5 | dataset$SR[row]==6 | dataset$SR[row]==7) & dataset$FC[row]==6)
+  {
+    dataset$SG50DD[row]=1
+  }
+  
+}
+
+
+model6 <- glm(as.factor(dataset$SG50DD) ~ WH + BF + NP + FA + AP + AR + DWH + T_t + TWR + 
+                DWR  + RS + H + DS + TA + E + A + C 
+              + N + O + AC + EC + TC, data = dataset, family='binomial')
+
+#summary(model6)
+
+forward_sg50dd <- stepAIC(model6, direction = "forward" , trace = 0)
+
+backward_sg50dd <- stepAIC(model6, direction = "backward" , trace = 0)
+
+both_sg50dd <- stepAIC(model6, direction = "both" , trace = 0)
+
+#forward_sg50dd$aic
+#backward_sg50dd$aic
+#both_sg50dd$aic
+
+
+f_m_s50dd <- glm(as.factor(dataset$SG50DD) ~ NP + TWR  + E + A , data=dataset,family='binomial')
+#summary(f_m_s50dd)
+
+
+
+```
+
+
+**Table S6 Parameter estimates for the Combined Grantsmanship and Grant Funding Configuration SG50DD(Logit Model (6), Methods).** The coefficients are given both probability-wise and odds-wise. The AIC for the model is
+160.95. Significance levels have been set as follows: \*: p < 0.05, \**: p < 0.01, \***: p < 0.001.
+
+
+```{r,echo=FALSE}
+
+# Table S6
+
+TS6 <- data.frame(coefficients(summary(f_m_s50dd)), check.names = TRUE)
+TS6$Prob_wise <- exp(TS6$Estimate)/(1+exp(TS6$Estimate))
+
+names(TS6)[1] <- 'Odds-wise'
+names(TS6)[4] <- "Pr(>|z|)"
+
+TS6 <- TS6 %>% add_significance("Pr(>|z|)")
+
+TS6  <- TS6 %>% relocate(Prob_wise, .before = `Odds-wise`)
+
+TS6  %>% kbl() %>% kable_classic(full_width = F, html_font = "Cambria")
+
+
+```
+
+# Figure 4
