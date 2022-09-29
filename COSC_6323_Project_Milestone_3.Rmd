@@ -21,7 +21,7 @@ library(gridExtra)
 ```
 ---
 title: "COSC 6323 Project Milestone-3"
-author: "Dhivya Parasuraman and Mahathi Sharma"
+author: "Mahathi Sharma"
 date: "5/9/2022"
 output:
   pdf_document: default
